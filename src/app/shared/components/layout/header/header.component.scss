@@ -1,0 +1,28 @@
+.nav-link {
+  position: relative;
+  padding-bottom: 4px;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #2563EB; // azul tailwind (blue-600)
+    border-radius: 1px;
+    transition: width 0.3s ease;
+  }
+
+  &:hover::after {
+    width: 100%;
+  }
+}
+
+.active-link {
+  color: #2563EB; // azul tailwind (blue-600)
+
+  &::after {
+    width: 100%;
+  }
+}
