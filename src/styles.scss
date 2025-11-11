@@ -29,3 +29,20 @@ html {
   height: auto !important;
   min-width: max-content !important;
 }
+
+/* Estilos para el overlay de Angular CDK */
+.cdk-overlay-container {
+  z-index: 9999 !important;
+}
+
+.cdk-overlay-backdrop {
+  background: transparent;
+}
+
+.cdk-overlay-transparent-backdrop {
+  background: transparent;
+}
+
+.cdk-overlay-pane {
+  z-index: 9999 !important;
+}
