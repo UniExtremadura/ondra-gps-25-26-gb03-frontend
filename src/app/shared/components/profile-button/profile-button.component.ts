@@ -1,13 +1,16 @@
-import { Component, signal, ViewChild, ElementRef } from '@angular/core';
-import { NgClass } from '@angular/common';
+import { Component, signal, ViewChild, ElementRef, inject, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router, RouterLink } from '@angular/router';
 import { Overlay, OverlayModule, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import { ViewContainerRef, TemplateRef } from '@angular/core';
+import { AuthStateService } from '../../../core/services/auth-state.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-profile-button',
   standalone: true,
-  imports: [OverlayModule],
+  imports: [CommonModule, OverlayModule],
   templateUrl: './profile-button.component.html',
   styleUrl: './profile-button.component.scss'
 })
@@ -15,17 +18,21 @@ export class ProfileButtonComponent {
   @ViewChild('dropdownTemplate') dropdownTemplate!: TemplateRef<any>;
   @ViewChild('buttonRef') buttonRef!: ElementRef;
 
+  private overlay = inject(Overlay);
+  private viewContainerRef = inject(ViewContainerRef);
+  private authState = inject(AuthStateService);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
   private overlayRef?: OverlayRef;
 
-  isAuthenticated = true;
-  userName = 'Miguel Ángel Campón';
-  userInitials = 'MC';
-  userPhoto = 'https://i.pravatar.cc/150?img=14';
-
-  constructor(
-    private overlay: Overlay,
-    private viewContainerRef: ViewContainerRef
-  ) {}
+  // Signals reactivos del estado de autenticación
+  readonly isAuthenticated = this.authState.isAuthenticated;
+  readonly currentUser = this.authState.currentUser;
+  readonly userName = this.authState.userFullName;
+  readonly userInitials = this.authState.userInitials;
+  readonly userPhoto = this.authState.userPhoto;
+  readonly userEmail = computed(() => this.currentUser()?.emailUsuario || 'usuario@ejemplo.com');
 
   toggleDropdown(): void {
     if (this.overlayRef?.hasAttached()) {
@@ -36,7 +43,6 @@ export class ProfileButtonComponent {
   }
 
   openDropdown(): void {
-    // Crear estrategia de posición
     const positionStrategy = this.overlay
       .position()
       .flexibleConnectedTo(this.buttonRef)
@@ -50,7 +56,6 @@ export class ProfileButtonComponent {
         }
       ]);
 
-    // Crear el overlay
     this.overlayRef = this.overlay.create({
       positionStrategy,
       scrollStrategy: this.overlay.scrollStrategies.reposition(),
@@ -58,14 +63,11 @@ export class ProfileButtonComponent {
       backdropClass: 'cdk-overlay-transparent-backdrop'
     });
 
-    // Attach el template
     const portal = new TemplatePortal(
       this.dropdownTemplate,
       this.viewContainerRef
     );
     this.overlayRef.attach(portal);
-
-    // Cerrar al hacer click en el backdrop
     this.overlayRef.backdropClick().subscribe(() => this.closeDropdown());
   }
 
@@ -78,16 +80,20 @@ export class ProfileButtonComponent {
   }
 
   accionAcceder(): void {
-    console.log('Click en Acceder');
+    this.router.navigate(['/login']);
   }
 
   accionPerfil(): void {
-    console.log('Click en Mi perfil');
+    const userId = this.currentUser()?.idUsuario;
     this.closeDropdown();
+    this.router.navigate(['/perfil', userId]);
   }
 
   accionCerrarSesion(): void {
-    console.log('Click en Cerrar sesión');
     this.closeDropdown();
+    this.authService.logout().subscribe({
+      next: () => console.log('✅ Sesión cerrada'),
+      error: (err) => console.error('❌ Error al cerrar sesión:', err)
+    });
   }
 }

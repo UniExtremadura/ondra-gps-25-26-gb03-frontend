@@ -1,5 +1,5 @@
 <!-- BOTÓN CUANDO NO ESTÁ AUTENTICADO -->
-@if (!isAuthenticated) {
+@if (!isAuthenticated()) {
   <button
     (click)="accionAcceder()"
     class="px-6 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
@@ -8,26 +8,26 @@
 }
 
 <!-- BOTÓN CUANDO ESTÁ AUTENTICADO -->
-@if (isAuthenticated) {
+@if (isAuthenticated()) {
   <button
     #buttonRef
     (click)="toggleDropdown()"
     class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-blue-200 transition-all duration-200 border border-transparent hover:border-blue-300">
 
     <!-- Foto de perfil o iniciales -->
-    @if (userPhoto) {
+    @if (userPhoto()) {
       <img
-        [src]="userPhoto"
-        [alt]="userName"
+        [src]="userPhoto()"
+        [alt]="userName()"
         class="w-10 h-10 rounded-full object-cover border-2 border-blue-600 shadow-sm">
     } @else {
       <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-blue-500 text-white flex items-center justify-center font-semibold text-sm shadow-sm">
-        {{ userInitials }}
+        {{ userInitials() }}
       </div>
     }
 
     <!-- Nombre del usuario -->
-    <span class="font-medium text-gray-800 hidden md:inline">{{ userName }}</span>
+    <span class="font-medium text-gray-800 hidden md:inline">{{ userName() }}</span>
 
     <!-- Icono dropdown -->
     <svg
@@ -45,8 +45,8 @@
   <div class="w-56 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 animate-fade-in mt-2">
     <!-- Información del usuario -->
     <div class="px-4 py-3 border-b border-gray-100">
-      <p class="text-sm font-semibold text-gray-800">{{ userName }}</p>
-      <p class="text-xs text-gray-500 mt-0.5">usuario&#64;ejemplo.com</p>
+      <p class="text-sm font-semibold text-gray-800">{{ userName() }}</p>
+      <p class="text-xs text-gray-500 mt-0.5">{{ userEmail() }}</p>
     </div>
 
     <!-- Opción: Mi perfil -->

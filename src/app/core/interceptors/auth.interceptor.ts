@@ -1,11 +1,20 @@
 import { HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { AuthStateService } from '../services/auth-state.service';
 
-/**
- * Interceptor simplificado (sin autenticación por ahora)
- * Cuando se implemente el login, aquí se añadirá el JWT
- */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  // Por ahora solo deja pasar las peticiones sin modificar
-  // Cuando esté auth, se añadirá el token JWT
+  const authState = inject(AuthStateService);
+  const fullToken = authState.getFullAuthToken(); // Ya incluye "Bearer "
+
+  // Solo añadir el token si la petición es a tu API
+  if (fullToken && req.url.includes('/api/')) {
+    const clonedRequest = req.clone({
+      setHeaders: {
+        Authorization: fullToken // "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+      }
+    });
+    return next(clonedRequest);
+  }
+
   return next(req);
 };
