@@ -1,3 +1,5 @@
+import {ArtistaDTO} from '../../shared/models/artista.model';
+
 /**
  * Enumeración de tipos de usuario
  */
@@ -6,21 +8,24 @@ export enum TipoUsuario {
   ARTISTA = 'ARTISTA'
 }
 
-/**
- * DTO del usuario (respuesta del backend)
- */
 export interface UsuarioDTO {
   idUsuario: number;
   emailUsuario: string;
   nombreUsuario: string;
   apellidosUsuario: string;
   tipoUsuario: TipoUsuario;
-  fotoPerfil?: string;
+  fotoPerfil: string | null;
   activo: boolean;
   permiteGoogle: boolean;
   emailVerificado: boolean;
-  fechaCreacion?: string;
-  fechaActualizacion?: string;
+  slug?: string;
+
+  // ✅ AGREGAR estos campos de artista
+  idArtista?: number;
+  nombreArtistico?: string;
+  biografiaArtistico?: string;
+  slugArtistico?: string;
+  fotoPerfilArtistico?: string;
 }
 
 /**

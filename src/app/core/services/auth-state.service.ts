@@ -1,5 +1,16 @@
 import { Injectable, signal, computed, effect } from '@angular/core';
-import { UsuarioDTO, AuthResponseDTO, AUTH_CONSTANTS } from '../models/auth.model';
+import { UsuarioDTO, AuthResponseDTO, AUTH_CONSTANTS, TipoUsuario } from '../models/auth.model';
+
+export interface UserInfo {
+  idUsuario: number;
+  email: string;
+  nombre: string;
+  apellidos: string;
+  tipoUsuario: TipoUsuario;
+  fotoPerfil?: string;
+  fotoPerfilArtistico?: string;
+  idArtista?: number;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -102,6 +113,36 @@ export class AuthStateService {
     const token = this._accessToken();
     const type = this._tokenType();
     return token ? `${type} ${token}` : null;
+  }
+
+  /**
+   * Obtiene la información del usuario en formato UserInfo
+   */
+  getUserInfo(): UserInfo | null {
+    const user = this._currentUser();
+    if (!user) return null;
+
+    return {
+      idUsuario: user.idUsuario,
+      email: user.emailUsuario,
+      nombre: user.nombreUsuario,
+      apellidos: user.apellidosUsuario,
+      tipoUsuario: user.tipoUsuario,
+      fotoPerfil: user.fotoPerfil ?? undefined,
+      idArtista: user.idArtista ?? undefined // ✅ AÑADIR
+    };
+  }
+
+  /**
+   * Actualiza información específica del usuario
+   */
+  updateUserInfo(updates: Partial<UsuarioDTO>): void {
+    const currentUser = this._currentUser();
+    if (currentUser) {
+      const updatedUser = { ...currentUser, ...updates };
+      this._currentUser.set(updatedUser);
+      localStorage.setItem(AUTH_CONSTANTS.LOCAL_STORAGE_KEYS.USER, JSON.stringify(updatedUser));
+    }
   }
 
   clearAuth(): void {

@@ -7,6 +7,7 @@ export interface ArtistaDTO {
   nombreArtistico: string;
   biografiaArtistico?: string;
   fotoPerfilArtistico?: string;
+  slugArtistico?: string;
   esTendencia: boolean;
   redesSociales: RedSocialDTO[];
 }

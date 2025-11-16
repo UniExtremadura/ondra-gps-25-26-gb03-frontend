@@ -1,0 +1,114 @@
+<!-- src/app/features/public-profile/public-profile.component.html -->
+
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
+  <!-- Botón Volver -->
+  <div class="container mx-auto px-4 py-6">
+    <button
+      (click)="goBack()"
+      class="group flex items-center gap-2 text-gray-600 hover:text-primary transition-all duration-200">
+      <div class="w-8 h-8 rounded-lg bg-white border border-gray-200 group-hover:border-primary flex items-center justify-center transition-all duration-200 shadow-sm group-hover:shadow-md">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </div>
+      <span class="font-medium">Volver</span>
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex justify-center items-center min-h-[400px]">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+  </div>
+
+  <!-- Profile Content -->
+  <div *ngIf="!isLoading && userProfile" class="container mx-auto px-4 pb-12 max-w-7xl">
+
+    <!-- Banner: "Este es tu perfil" si es propio -->
+    <div *ngIf="isOwnProfile" class="mb-6 bg-blue-50 border-2 border-blue-200 rounded-xl p-4 flex items-center justify-between shadow-sm">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+          <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <p class="text-blue-900 font-semibold">Estás viendo tu perfil público</p>
+      </div>
+      <button
+        (click)="irAMiPerfil()"
+        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-semibold shadow-sm">
+        Editar mi perfil
+      </button>
+    </div>
+
+    <!-- Layout de 2 columnas: Profile Header (izq) + Contenido (der) -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Columna Izquierda: Profile Header -->
+      <div class="lg:col-span-1 flex">
+        <app-profile-header
+          class="block w-full"
+          [userProfile]="userProfile"
+          [estadisticas]="estadisticas"
+          [isOwnProfile]="false"
+          [isPublicView]="true"
+          [isFollowing]="isFollowing"
+          [isProcessingFollow]="isProcessingFollow"
+          [showFollowButton]="showFollowButton"
+          [totalReproducciones]="totalReproducciones"
+          (openModalEvent)="openModal($event)"
+          (followClick)="toggleFollow()">
+        </app-profile-header>
+      </div>
+
+      <!-- Columna Derecha: Contenido -->
+      <div class="lg:col-span-2 flex flex-col space-y-6">
+
+        <!-- ============================================ -->
+        <!-- CONTENIDO PARA USUARIO NORMAL -->
+        <!-- ============================================ -->
+        <ng-container *ngIf="!isArtist">
+          <!-- Favoritos públicos -->
+          <div class="bg-white rounded-lg shadow-sm border border-blue-900 p-6 flex-1 flex flex-col">
+            <app-favorites-preview
+              [userId]="userProfile.idUsuario"
+              [isOwnProfile]="false">
+            </app-favorites-preview>
+          </div>
+        </ng-container>
+
+        <!-- ============================================ -->
+        <!-- CONTENIDO PARA ARTISTA -->
+        <!-- ============================================ -->
+        <ng-container *ngIf="isArtist">
+          <!-- Canciones -->
+          <div class="bg-white rounded-lg shadow-sm border border-blue-900 p-6 flex flex-col">
+            <app-canciones-preview
+              [artistaId]="userProfile.idUsuario"
+              [isOwnProfile]="false">
+            </app-canciones-preview>
+          </div>
+
+          <!-- Álbumes -->
+          <div class="bg-white rounded-lg shadow-sm border border-blue-900 p-6 flex flex-col">
+            <app-albumes-preview
+              [artistaId]="userProfile.idUsuario"
+              [isOwnProfile]="false">
+            </app-albumes-preview>
+          </div>
+        </ng-container>
+
+      </div>
+
+    </div> <!-- Cierre del grid -->
+
+  </div> <!-- Cierre del container -->
+
+  <!-- Modal de Seguidos/Seguidores -->
+  <app-followers-modal
+    *ngIf="modalType && userProfile"
+    [modalType]="modalType"
+    [userId]="userProfile.idUsuario"
+    (closeModal)="closeModal()"
+    (statsUpdated)="recargarEstadisticas()">
+  </app-followers-modal>
+</div>

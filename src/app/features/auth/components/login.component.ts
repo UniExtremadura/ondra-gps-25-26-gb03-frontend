@@ -316,7 +316,7 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
     this.authService.restablecerPassword({
       emailUsuario: this.emailRecuperacion(),
       codigoVerificacion: this.codigoRecuperacion(),
-      nuevaPassword : formValue.password
+      nuevaPassword: formValue.password
     }).subscribe({
       next: () => {
         this.setSuccess('Contraseña restablecida correctamente');
@@ -528,14 +528,40 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  // ============================================
+  // ✅ MÉTODOS DE MENSAJES CON SCROLL AUTOMÁTICO
+  // ============================================
+
+  /**
+   * Hace scroll suave hacia arriba de la página
+   */
+  private scrollToTop(): void {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }
+
+  /**
+   * Establece mensaje de éxito y hace scroll hacia arriba
+   */
   private setSuccess(message: string): void {
     this.successMessage.set(message);
     this.errorMessage.set(null);
+
+    // ✅ Hacer scroll después de un pequeño delay para que el DOM se actualice
+    setTimeout(() => this.scrollToTop(), 100);
   }
 
+  /**
+   * Establece mensaje de error y hace scroll hacia arriba
+   */
   private setError(message: string): void {
     this.errorMessage.set(message);
     this.successMessage.set(null);
+
+    // ✅ Hacer scroll después de un pequeño delay para que el DOM se actualice
+    setTimeout(() => this.scrollToTop(), 100);
   }
 
   private clearMessages(): void {

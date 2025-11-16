@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { AuthStateService } from './auth-state.service';
@@ -54,28 +54,29 @@ export class AuthService {
     );
   }
 
-  logout(): Observable<void> {
+  // auth.service.ts
+  logout(): void {
     const refreshToken = this.authState.getRefreshToken();
-    if (!refreshToken) {
-      this.authState.clearAuth();
-      this.router.navigate(['/']);
-      return throwError(() => new Error('No hay sesión activa'));
+
+    console.log('🔴 Cerrando sesión...');
+
+    // 1. Limpiar frontend inmediatamente
+    this.authState.clearAuth();
+    this.router.navigate(['/']);
+
+    // 2. Revocar en backend en segundo plano
+    if (refreshToken) {
+      this.http.post<void>(`${this.API_URL}/logout`, { refreshToken })
+        .pipe(
+          catchError(err => {
+            console.warn('⚠️ Error al revocar token en servidor:', err);
+            return of(undefined); // Ignorar error
+          })
+        )
+        .subscribe(() => {
+          console.log('✅ Token revocado en el servidor');
+        });
     }
-
-    const body: RefreshTokenRequestDTO = { refreshToken };
-
-    return this.http.post<void>(`${this.API_URL}/logout`, body).pipe(
-      tap(() => {
-        this.authState.clearAuth();
-        this.router.navigate(['/']);
-        console.log('✅ Sesión cerrada');
-      }),
-      catchError(error => {
-        this.authState.clearAuth();
-        this.router.navigate(['/']);
-        return throwError(() => error);
-      })
-    );
   }
 
   refreshToken(): Observable<RefreshTokenResponseDTO> {
@@ -88,16 +89,16 @@ export class AuthService {
 
     return this.http.post<RefreshTokenResponseDTO>(`${this.API_URL}/refresh`, body).pipe(
       tap(response => {
-        // Actualizar con el tipo de token que venga del backend
+        // Actualizar tokens
         this.authState.updateTokens(
           response.accessToken,
           response.refreshToken,
-          response.tipo // "Bearer"
+          response.tipo
         );
-        console.log('✅ Tokens renovados');
+        console.log('✅ Tokens renovados correctamente');
       }),
       catchError(error => {
-        this.logout().subscribe();
+        console.error('❌ Error al renovar token:', error);
         return throwError(() => error);
       })
     );
@@ -173,4 +174,6 @@ export class AuthService {
     console.error('❌ Error en AuthService:', errorMessage, error);
     return throwError(() => new Error(errorMessage));
   }
+
+
 }
