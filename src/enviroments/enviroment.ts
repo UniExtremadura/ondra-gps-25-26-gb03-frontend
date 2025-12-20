@@ -15,11 +15,11 @@ export const environment = {
   /** URLs base de los microservicios */
   apis: {
     /** Microservicio de Usuarios */
-    usuarios: 'http://localhost:8080/api',
+    usuarios: '/api',
     /** Microservicio de Contenidos */
-    contenidos: 'http://localhost:8081/api',
+    contenidos: '/api',
     /** Microservicio de Recomendaciones */
-    recomendaciones: 'http://localhost:8082/api'
+    recomendaciones: '/api'
   },
 
   /** Nombre de la aplicación */
