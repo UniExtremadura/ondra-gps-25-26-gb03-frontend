@@ -1,9 +1,9 @@
 #!/bin/sh
 
 # Valores por defecto
-API_USUARIOS_URL=${API_USUARIOS_URL:-http://localhost:8080}
-API_CONTENIDOS_URL=${API_CONTENIDOS_URL:-http://localhost:8081}
-API_RECOMENDACIONES_URL=${API_RECOMENDACIONES_URL:-http://localhost:8082}
+API_USUARIOS_URL=${API_USUARIOS_URL}
+API_CONTENIDOS_URL=${API_CONTENIDOS_URL}
+API_RECOMENDACIONES_URL=${API_RECOMENDACIONES_URL}
 
 # Crear archivo de configuración JavaScript
 cat <<EOF > /usr/share/nginx/html/assets/config.js
